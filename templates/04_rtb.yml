@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: RoutTable Sample
+
+Parameters:
+  Env:
+    Type: String
+    AllowedValues:
+      - dev
+    Default: dev
+  ProjectName:
+    Type: String
+
+Resources:
+  PrivateRouteTable1a:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Sub ${Env}-${ProjectName}-vpc
+      Tags:
+        - Key: Name
+          Value: !Sub ${Env}-${ProjectName}-private-route-table-1a
+
+  AssociatePrivateRouteTable1aToPrivateSubnet1a:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Fn::ImportValue: !Sub ${Env}-${ProjectName}-private-subnet-1a
+      RouteTableId:
+        Ref: PrivateRouteTable1a
+
+Outputs:
+  PrivateRouteTable1aId:
+    Value: !Ref PrivateRouteTable1a
+    Export:
+      Name: !Sub ${Env}-${ProjectName}-private-route-table-1a

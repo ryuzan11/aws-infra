@@ -22,12 +22,10 @@ Resources:
       BucketName: !FindInMap [ EnvMap, !Ref Env, S3BucketName]
       AccessControl: Private
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: True
-        BlockPublicPolicy: True
-        IgnorePublicAcls: True
-        RestrictPublicBuckets: True
-
-
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
 Outputs:
   S3BucketName:
