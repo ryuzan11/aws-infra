@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: VPCS3 Endpoint Sample
+Description: VPC Endpoint Sample
 
 Parameters:
   Env:
@@ -27,5 +27,17 @@ Resources:
         - Fn::ImportValue: !Sub ${Env}-${ProjectName}-private-route-table-1a
       ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
       VpcEndpointType: Gateway
+      VpcId:
+        Fn::ImportValue: !Sub ${Env}-${ProjectName}-vpc
+
+  LambdaEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      SecurityGroupIds:
+        - Fn::ImportValue: !Sub ${Env}-${ProjectName}-vpc-endpoint-sg
+      SubnetIds:
+        - Fn::ImportValue: !Sub ${Env}-${ProjectName}-private-subnet-1a
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.lambda
+      VpcEndpointType: Interface
       VpcId:
         Fn::ImportValue: !Sub ${Env}-${ProjectName}-vpc

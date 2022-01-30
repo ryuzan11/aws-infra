@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Security Group Sample
+
+Parameters:
+  Env:
+    Type: String
+    AllowedValues:
+      - dev
+    Default: dev
+  ProjectName:
+    Type: String
+
+Resources:
+  LambdaS3TriggerSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: for Lambda S3 Trigger
+      GroupName: !Sub ${Env}-${ProjectName}-lambda-s3-trigger-sg
+      VpcId:
+        Fn::ImportValue: !Sub ${Env}-${ProjectName}-vpc
+      Tags:
+        - Key: Name
+          Value: !Sub ${Env}-${ProjectName}-lambda-s3-trigger-sg
+
+  VpcEndpointSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Sub ${Env}-${ProjectName}-vpc
+      GroupDescription: "Security-Group for VPC Endpoint"
+      Tags:
+        - Key: Name
+          Value: !Sub ${Env}-${ProjectName}-vpc-endpoint-sg
+
+Outputs:
+  LambdaS3TriggerSgId:
+    Value: !Ref LambdaS3TriggerSg
+    Export:
+      Name: !Sub ${Env}-${ProjectName}-lambda-s3-trigger-sg
+
+  VpcEndpointSgId:
+    Value: !Ref VpcEndpointSg
+    Export:
+      Name: !Sub ${Env}-${ProjectName}-vpc-endpoint-sg

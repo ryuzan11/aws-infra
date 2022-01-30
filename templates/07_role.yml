@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: IAM Role Sample
+
+Parameters:
+  Env:
+    Type: String
+    AllowedValues:
+      - dev
+    Default: dev
+  ProjectName:
+    Type: String
+
+Resources:
+  LambdaS3TriggerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: "lambda-s3-trigger"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "ec2:CreateNetworkInterface"
+                  - "ec2:DescribeNetworkInterfaces"
+                  - "ec2:DeleteNetworkInterface"
+                  - "ec2:AssignPrivateIpAddresses"
+                  - "ec2:UnassignPrivateIpAddresses"
+                  - "s3:GetBucketNotification"
+                  - "s3:PutBucketNotification"
+                  - "s3:GetObject"
+                  - "lambda:InvokeFunction"
+                Resource: "*"
+      Tags:
+        - Key: Name
+          Value: !Sub ${Env}-${ProjectName}-lambda-s3-trigger-role
+
+  LambdaCustomExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+      Policies:
+        - PolicyName: "aws-sample-202111-lambda-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "ec2:CreateNetworkInterface"
+                  - "ec2:DescribeNetworkInterfaces"
+                  - "ec2:DeleteNetworkInterface"
+                  - "ec2:AssignPrivateIpAddresses"
+                  - "ec2:UnassignPrivateIpAddresses"
+                Resource: "*"
+      Tags:
+        - Key: Name
+          Value: !Sub ${Env}-${ProjectName}-lambda-custom-execution-role
+
+Outputs:
+  LambdaS3TriggerRoleId:
+    Value:
+      !GetAtt LambdaS3TriggerRole.Arn
+    Export:
+      Name: !Sub ${Env}-${ProjectName}-lambda-s3-trigger-role
+
+  LambdaCustomExecutionRoleId:
+    Value:
+      !GetAtt LambdaCustomExecutionRole.Arn
+    Export:
+      Name: !Sub ${Env}-${ProjectName}-lambda-custom-execution-role
